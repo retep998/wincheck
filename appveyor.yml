@@ -11,5 +11,5 @@ install:
   - rustc -vV
   - cargo -vV
 build_script:
-  - git checkout https://github.com/retep998/winapi-rs.git
+  - git clone https://github.com/retep998/winapi-rs.git
   - cargo build
