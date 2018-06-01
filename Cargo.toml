@@ -10,7 +10,7 @@ winapi = { git = "https://github.com/retep998/winapi-rs.git" }
 ansi_term = "*"
 atomicwrites = "*"
 atty = "*"
-audio_thread_priority = "*"
+# audio_thread_priority = "*" # Not my fault
 auto = "*"
 autogui = "*"
 autopilot = "*"
