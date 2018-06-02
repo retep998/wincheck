@@ -23,7 +23,6 @@ c-ares-resolver = "*"
 c-ares-sys = "*"
 c-types = "*"
 # cairo-sys-rs = "*" # Awful build script
-cargo = "*"
 clicolors-control = "*"
 clipboard-master = "*"
 clipboard-win = "*"
@@ -141,6 +140,7 @@ mysql = "*" # Not my fault
 sandbox-ipc = "*" # Not my fault
 
 [target.'cfg(target_env="msvc")'.dependencies]
+cargo = "*" # Build scripts
 curl = "*" # Build scripts
 curl-sys = "*" # Build scripts
 git-find = "*" # Build scripts
