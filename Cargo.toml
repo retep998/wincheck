@@ -68,7 +68,6 @@ listenfd = "*"
 livesplit-hotkey = "*"
 log4rs = "*"
 mac_address = "*"
-may = "*"
 # mem_file = "*" # Yanked
 memmap = "*"
 memsec = "*"
@@ -139,6 +138,7 @@ winutil = "*"
 wio = "*"
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
+may = "*" # Due to generator
 mysql = "*" # Not my fault
 
 [target.'cfg(target_env="msvc")'.dependencies]
