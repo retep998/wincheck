@@ -87,6 +87,7 @@ remove_dir_all = "*"
 ripgrep = "*"
 rusty-xinput = "*"
 same-file = "*"
+sandbox-ipc = "*"
 scaproust = "*"
 schannel = "*"
 serialport = "*"
@@ -134,7 +135,6 @@ mysql = "*" # Not my fault
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
 may = "*" # Build scripts
-sandbox-ipc = "*" # Not my fault
 
 [target.'cfg(target_env="msvc")'.dependencies]
 c-ares = "*" # Build scripts
