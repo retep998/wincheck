@@ -6,15 +6,22 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        toolchain: [nightly-x86_64-msvc, nightly-i686-msvc, nightly-x86_64-gnu, nightly-i686-gnu]
+        toolchain:
+          [
+            nightly-x86_64-msvc,
+            nightly-i686-msvc,
+            nightly-x86_64-gnu,
+            nightly-i686-gnu,
+          ]
+        index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ matrix.toolchain }}
-        default: true
-        profile: minimal
-    - name: Fetch crates.io index
-      run: git clone --depth 1 https://github.com/rust-lang/crates.io-index.git
-    - name: Test
-      run: cargo run --release
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          default: true
+          profile: minimal
+      - name: Fetch crates.io index
+        run: git clone --depth 1 https://github.com/rust-lang/crates.io-index.git
+      - name: Test
+        run: cargo run --release -- ${{ matrix.toolchain }} 10

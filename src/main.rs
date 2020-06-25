@@ -1,6 +1,7 @@
 use semver::{Version, VersionReq};
 use serde_json::{from_str, Value};
 use std::{
+    env::args,
     fs::{remove_dir_all, write, File},
     io::{BufRead, BufReader},
     process::{exit, Command, Stdio},
@@ -8,6 +9,8 @@ use std::{
 use walkdir::WalkDir;
 
 fn main() {
+    let mut index: u32 = args().nth(1).unwrap().parse().unwrap();
+    let modulus: u32 = args().nth(2).unwrap().parse().unwrap();
     let target_version = Version::parse("0.3.9").unwrap();
     let bad_version = Version::parse("0.2.8").unwrap();
     let mut broken = Vec::new();
@@ -62,6 +65,10 @@ fn main() {
             continue;
         }
         if needed_version.matches(&bad_version) {
+            continue;
+        }
+        index += 1;
+        if index % modulus != 0 {
             continue;
         }
         write(
