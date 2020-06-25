@@ -1,20 +1,22 @@
 use semver::{Version, VersionReq};
 use serde_json::{from_str, Value};
 use std::{
-    fs::File,
+    fs::{write, File},
     io::{BufRead, BufReader},
+    process::{Command, Stdio},
 };
 use walkdir::WalkDir;
 
 fn main() {
     let target_version = Version::parse("0.3.9").unwrap();
     let bad_version = Version::parse("0.2.8").unwrap();
+    let mut broken = Vec::new();
     for entry in WalkDir::new("crates.io-index")
         .into_iter()
         .filter_entry(|e| e.file_name() != ".git" && e.file_name() != "config.json")
     {
         let entry = entry.unwrap();
-        let name = entry.file_name().to_str().unwrap();
+        let crate_name = entry.file_name().to_str().unwrap();
         if !entry.file_type().is_file() {
             continue;
         }
@@ -62,6 +64,80 @@ fn main() {
         if needed_version.matches(&bad_version) {
             continue;
         }
-        println!("{}:{}", name, crate_version);
+        write(
+            r"before\Cargo.toml",
+            format!(
+                r#"[package]
+name = "wincheck-before"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+{} = "{}""#,
+                crate_name, crate_version
+            ),
+        )
+        .unwrap();
+        write(
+            r"after\Cargo.toml",
+            format!(
+                r#"[package]
+name = "wincheck-after"
+version = "0.1.0"
+edition = "2018"
+
+[patch.crates-io]
+winapi = {{ git = "https://github.com/retep998/winapi-rs.git", branch = "0.3" }}
+
+[dependencies]
+{} = "{}""#,
+                crate_name, crate_version
+            ),
+        )
+        .unwrap();
+        let before = Command::new("cargo")
+            .arg("build")
+            .current_dir("before")
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .output()
+            .unwrap();
+        let after = Command::new("cargo")
+            .arg("build")
+            .current_dir("after")
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .output()
+            .unwrap();
+        match (before.status.success(), after.status.success()) {
+            (true, true) => println!("{}:{} unchanged working", crate_name, crate_version),
+            (true, false) => {
+                println!("{}:{} was broken!!!", crate_name, crate_version);
+                let before_output = format!(
+                    "{}\n{}",
+                    String::from_utf8_lossy(&before.stdout),
+                    String::from_utf8_lossy(&before.stderr)
+                );
+                let after_output = format!(
+                    "{}\n{}",
+                    String::from_utf8_lossy(&after.stdout),
+                    String::from_utf8_lossy(&after.stderr)
+                );
+                broken.push((
+                    crate_name.to_owned(),
+                    crate_version,
+                    before_output,
+                    after_output,
+                ));
+            }
+            (false, true) => println!("{}:{} was magically fixed?!", crate_name, crate_version),
+            (false, false) => println!("{}:{} unchanged failing", crate_name, crate_version),
+        }
+    }
+    for (crate_name, crate_version, _, after) in broken {
+        println!("Rust output from {}:{}", crate_name, crate_version);
+        println!("{}", after);
     }
 }
