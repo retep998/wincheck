@@ -94,7 +94,7 @@ version = "0.1.0"
 edition = "2018"
 
 [patch.crates-io]
-winapi = {{ git = "https://github.com/retep998/winapi-rs.git", branch = "dev" }}
+winapi = {{ git = "https://github.com/retep998/winapi-rs.git", branch = "0.3" }}
 
 [dependencies]
 {} = "{}""#,
