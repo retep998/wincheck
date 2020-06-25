@@ -1,9 +1,9 @@
 use semver::{Version, VersionReq};
 use serde_json::{from_str, Value};
 use std::{
-    fs::{write, File},
+    fs::{remove_dir_all, write, File},
     io::{BufRead, BufReader},
-    process::{Command, Stdio},
+    process::{exit, Command, Stdio},
 };
 use walkdir::WalkDir;
 
@@ -95,20 +95,18 @@ winapi = {{ git = "https://github.com/retep998/winapi-rs.git", branch = "0.3" }}
             ),
         )
         .unwrap();
+        let _ = remove_dir_all(r"before\target");
+        let _ = remove_dir_all(r"after\target");
         let before = Command::new("cargo")
             .arg("build")
             .current_dir("before")
             .stdin(Stdio::null())
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
             .output()
             .unwrap();
         let after = Command::new("cargo")
             .arg("build")
             .current_dir("after")
             .stdin(Stdio::null())
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
             .output()
             .unwrap();
         match (before.status.success(), after.status.success()) {
@@ -136,8 +134,12 @@ winapi = {{ git = "https://github.com/retep998/winapi-rs.git", branch = "0.3" }}
             (false, false) => println!("{}:{} unchanged failing", crate_name, crate_version),
         }
     }
+    if broken.is_empty() {
+        exit(0);
+    }
     for (crate_name, crate_version, _, after) in broken {
         println!("Rust output from {}:{}", crate_name, crate_version);
         println!("{}", after);
     }
+    exit(1);
 }
