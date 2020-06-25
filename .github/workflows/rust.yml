@@ -24,4 +24,4 @@ jobs:
       - name: Fetch crates.io index
         run: git clone --depth 1 https://github.com/rust-lang/crates.io-index.git
       - name: Test
-        run: cargo run --release -- ${{ matrix.toolchain }} 5
+        run: cargo run --release -- ${{ matrix.index }} 5
