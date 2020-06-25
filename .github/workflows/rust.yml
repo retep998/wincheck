@@ -1,0 +1,20 @@
+name: Rust
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        toolchain: [nightly-x86_64-msvc, nightly-i686-msvc, nightly-x86_64-gnu, nightly-i686-gnu]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.toolchain }}
+        default: true
+        profile: minimal
+    - name: Fetch crates.io index
+      run: git clone --depth 1 https://github.com/rust-lang/crates.io-index.git
+    - name: Test
+      run: cargo run --release
