@@ -13,7 +13,7 @@ jobs:
             nightly-x86_64-gnu,
             nightly-i686-gnu,
           ]
-        index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        index: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -24,4 +24,4 @@ jobs:
       - name: Fetch crates.io index
         run: git clone --depth 1 https://github.com/rust-lang/crates.io-index.git
       - name: Test
-        run: cargo run --release -- ${{ matrix.toolchain }} 10
+        run: cargo run --release -- ${{ matrix.toolchain }} 5
